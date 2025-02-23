@@ -1,138 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>System Core Test Terminal</title>
-    <style>
-      body {
-        font-family: monospace;
-        background-color: #1e1e1e;
-        color: #d4d4d4;
-        margin: 0;
-        padding: 20px;
-      }
-      #terminal {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
-        border: 1px solid #333;
-        padding: 10px;
-        background-color: #262626;
-        min-height: 400px;
-        overflow-y: auto;
-      }
-      #output {
-        white-space: pre-wrap;
-        line-height: 1.4em;
-      }
-      #command-input {
-        width: calc(100% - 20px);
-        padding: 8px;
-        margin-top: 10px;
-        border: none;
-        background-color: #333;
-        color: #d4d4d4;
-      }
-      #command-input:focus {
-        outline: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="terminal">
-      <div id="output"></div>
-      <input
-        type="text"
-        id="command-input"
-        placeholder="Enter command here..."
-        autofocus
-      />
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <title>Godspear Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Inline CSS for terminal styling -->
+  <style>
+    body {
+      margin: 0;
+      background-color: #1e1e1e;
+      font-family: monospace;
+      color: #d4d4d4;
+      overflow: hidden;
+    }
+    /* Status bar for time and battery */
+    #status-bar {
+      background: #333;
+      color: #fff;
+      padding: 5px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* Container that holds terminal sessions */
+    #terminal-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 30px);
+      background-color: #1e1e1e;
+    }
+    /* Terminal session styling */
+    .terminal-session {
+      position: absolute;
+      background: #000;
+      border: 1px solid #444;
+      color: #0f0;
+      resize: both;
+      overflow: auto;
+      min-width: 300px;
+      min-height: 200px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    }
+    .terminal-header {
+      background: #222;
+      padding: 5px;
+      cursor: move;
+      user-select: none;
+    }
+    .terminal-body {
+      padding: 5px;
+      height: calc(100% - 70px);
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .terminal-input {
+      width: 100%;
+      border: none;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      outline: none;
+      padding: 5px;
+    }
+  </style>
+  <!-- Load the advanced kernel -->
+  <script src="scripts/kernel.js" defer></script>
+</head>
+<body>
+  <!-- Status Bar -->
+  <div id="status-bar">
+    <div id="time-display">--:--:--</div>
+    <div id="battery-display">Battery: --%</div>
+  </div>
+  <!-- Container for terminal sessions -->
+  <div id="terminal-container">
+    <!-- Terminal sessions will be dynamically created -->
+  </div>
+  
+  <!-- Godspear Terminal Script -->
+  <script>
+    // Session management for multiple terminal windows
+    let sessionCount = 0;
+    let activeSession = null;
+    const sessions = [];
 
-    <!-- Include the kernel core -->
-    <script src="kernel.js"></script>
+    // Create a new terminal session at optional coordinates
+    function createTerminalSession(x = 50, y = 50) {
+      sessionCount++;
+      const session = document.createElement('div');
+      session.classList.add('terminal-session');
+      session.style.left = x + 'px';
+      session.style.top = y + 'px';
+      session.style.width = '400px';
+      session.style.height = '300px';
+      session.dataset.sessionId = sessionCount;
 
-    <!-- Terminal Command Parser and Handler -->
-    <script>
-      // Get references to DOM elements.
-      const outputEl = document.getElementById("output");
-      const inputEl = document.getElementById("command-input");
+      // Create header for dragging and display session title
+      const header = document.createElement('div');
+      header.classList.add('terminal-header');
+      header.innerText = `Godspear Terminal Session ${sessionCount}`;
+      session.appendChild(header);
 
-      // Print text to the terminal output area.
-      function printOutput(text) {
-        outputEl.innerText += text + "\n";
-        outputEl.scrollTop = outputEl.scrollHeight;
-      }
+      // Terminal body for output display
+      const body = document.createElement('div');
+      body.classList.add('terminal-body');
+      body.id = `terminal-body-${sessionCount}`;
+      session.appendChild(body);
 
-      // Display initial help message.
-      printOutput("Welcome to the Test Terminal. Type 'help' for commands.");
-
-      // Command parser: tokenizes input and calls appropriate kernel functions.
-      function handleCommand(command) {
-        const args = command.trim().split(" ");
-        const cmd = args[0].toLowerCase();
-
-        switch (cmd) {
-          case "help":
-            printOutput("Available commands:");
-            printOutput("  help             - Show this help message.");
-            printOutput(
-              "  start [name]     - Start a process with the given name."
-            );
-            printOutput("  list             - List all running processes.");
-            printOutput(
-              "  broadcast [msg]  - Broadcast a message to all processes."
-            );
-            break;
-
-          case "start":
-            if (args.length < 2) {
-              printOutput("Error: 'start' command requires a process name.");
-            } else {
-              const procName = args.slice(1).join(" ");
-              const proc = kernel.startProcess(procName);
-              printOutput(
-                `Process started: PID ${proc.pid}, Name: ${proc.name}`
-              );
+      // Input field for commands with autofocus enabled
+      const input = document.createElement('input');
+      input.classList.add('terminal-input');
+      input.placeholder = 'Enter command...';
+      input.autofocus = true;
+      input.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+          const command = input.value;
+          appendToTerminal(body, `> ${command}`);
+          input.value = '';
+          try {
+            // Replace eval with a secure command parser that interacts with your kernel as needed.
+            let result = await eval(command);
+            if (typeof result === "object") {
+              result = JSON.stringify(result);
             }
-            break;
-
-          case "list":
-            const procs = kernel.listProcesses();
-            if (procs.length === 0) {
-              printOutput("No processes are currently running.");
-            } else {
-              printOutput("Running processes:");
-              procs.forEach((proc) => {
-                printOutput(`  PID ${proc.pid}: ${proc.name} [${proc.status}]`);
-              });
-            }
-            break;
-
-          case "broadcast":
-            if (args.length < 2) {
-              printOutput("Error: 'broadcast' command requires a message.");
-            } else {
-              const msg = args.slice(1).join(" ");
-              kernel.broadcast(msg);
-              printOutput(`Broadcasted message: "${msg}"`);
-            }
-            break;
-
-          default:
-            printOutput(`Unrecognized command: ${command}`);
-        }
-      }
-
-      // Listen for Enter key events in the command input.
-      inputEl.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-          const command = inputEl.value;
-          printOutput("> " + command);
-          handleCommand(command);
-          inputEl.value = "";
+            appendToTerminal(body, result);
+          } catch (err) {
+            appendToTerminal(body, `Error: ${err.message}`);
+          }
+          body.scrollTop = body.scrollHeight;
         }
       });
-    </script>
-  </body>
+      session.appendChild(input);
+
+      // When the session is clicked, focus its input field
+      session.addEventListener('click', () => {
+        input.focus();
+        setActiveSession(session);
+      });
+
+      // Enable dragging for the session window
+      makeDraggable(session, header);
+      
+      document.getElementById('terminal-container').appendChild(session);
+      sessions.push(session);
+      setActiveSession(session);
+      // Focus the input after a short delay to ensure rendering is complete
+      setTimeout(() => input.focus(), 100);
+    }
+
+    // Append a line of text to the terminal body
+    function appendToTerminal(body, text) {
+      const line = document.createElement('div');
+      line.innerText = text;
+      body.appendChild(line);
+    }
+
+    // Set the active (focused) session and bring it to front
+    function setActiveSession(session) {
+      activeSession = session;
+      sessions.forEach(s => {
+        s.style.zIndex = (s === session) ? 1000 : 1;
+      });
+    }
+
+    // Make an element draggable using its handle (the header)
+    function makeDraggable(el, handle) {
+      let offsetX = 0, offsetY = 0, startX = 0, startY = 0;
+      handle.style.cursor = 'move';
+      handle.addEventListener('mousedown', dragMouseDown);
+      function dragMouseDown(e) {
+        e.preventDefault();
+        setActiveSession(el);
+        startX = e.clientX;
+        startY = e.clientY;
+        document.addEventListener('mousemove', elementDrag);
+        document.addEventListener('mouseup', closeDragElement);
+      }
+      function elementDrag(e) {
+        e.preventDefault();
+        offsetX = startX - e.clientX;
+        offsetY = startY - e.clientY;
+        startX = e.clientX;
+        startY = e.clientY;
+        el.style.top = (el.offsetTop - offsetY) + "px";
+        el.style.left = (el.offsetLeft - offsetX) + "px";
+      }
+      function closeDragElement() {
+        document.removeEventListener('mousemove', elementDrag);
+        document.removeEventListener('mouseup', closeDragElement);
+      }
+    }
+
+    // Global hotkeys for terminal management
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+N creates a new terminal session
+      if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        createTerminalSession(100 + sessions.length * 20, 100 + sessions.length * 20);
+      }
+      // Ctrl+W closes the active terminal session
+      if (e.ctrlKey && e.key === 'w') {
+        e.preventDefault();
+        if (activeSession) {
+          activeSession.remove();
+          const index = sessions.indexOf(activeSession);
+          if (index > -1) sessions.splice(index, 1);
+          activeSession = sessions[sessions.length - 1] || null;
+        }
+      }
+      // Ctrl+Tab cycles through terminal sessions
+      if (e.ctrlKey && e.key === 'Tab') {
+        e.preventDefault();
+        if (sessions.length > 0) {
+          let index = sessions.indexOf(activeSession);
+          index = (index + 1) % sessions.length;
+          setActiveSession(sessions[index]);
+          // Focus the input of the new active session
+          const input = sessions[index].querySelector('.terminal-input');
+          if (input) input.focus();
+        }
+      }
+    });
+
+    // Update the time display every second
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time-display').innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+
+    // Update battery status using the Battery API (if available)
+    async function updateBattery() {
+      if (navigator.getBattery) {
+        const battery = await navigator.getBattery();
+        const level = Math.round(battery.level * 100);
+        document.getElementById('battery-display').innerText = `Battery: ${level}%`;
+        battery.addEventListener('levelchange', updateBattery);
+      } else {
+        document.getElementById('battery-display').innerText = 'Battery: N/A';
+      }
+    }
+    updateBattery();
+
+    // Create the initial terminal session on page load
+    window.addEventListener('load', () => {
+      createTerminalSession();
+    });
+  </script>
+</body>
 </html>
