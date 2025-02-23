@@ -1,31 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <title>Full Screen Terminal</title>
-    <link rel="stylesheet" href="./xterm.js/css/xterm.css" />
+    <meta charset="UTF-8">
+    <title>Full-Screen xterm.js Terminal</title>
+    <!-- Link to xterm.css -->
+    <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
     <style>
-      html,
-      body {
+      /* Fullscreen styling */
+      html, body {
+        height: 100%;
         margin: 0;
         padding: 0;
-        width: 100%;
-        height: 100%;
-        background: #000;
+        background-color: #000;
       }
-      #terminal-container {
+
+      /* Fullscreen terminal container */
+      #terminal {
         width: 100%;
         height: 100%;
       }
     </style>
+    <!-- xterm.js library -->
+    <script src="node_modules/xterm/lib/xterm.js"></script>
   </head>
   <body>
-    <div id="terminal-container"></div>
-    <script src="./xterm.js"></script>
+    <!-- Terminal container -->
+    <div id="terminal"></div>
+
+    <!-- Initialize xterm.js -->
     <script>
-      const terminal = new Terminal();
-      terminal.open(document.getElementById("terminal-container"));
-      terminal.write("Welcome to xterm.js full screen!\r\n");
+      // Initialize terminal
+      const term = new Terminal({
+        cursorBlink: true, // Enable cursor blinking
+        fontFamily: 'monospace',
+        theme: {
+          background: '#000000', // Set background color
+          foreground: '#ffffff'  // Set text color
+        }
+      });
+
+      // Attach terminal to the DOM
+      term.open(document.getElementById('terminal'));
+
+      // Resize terminal to fill the container
+      function fitTerminal() {
+        const terminalContainer = document.getElementById('terminal');
+        term.resize(
+          Math.floor(terminalContainer.clientWidth / term._core._renderService.dimensions.actualCellWidth),
+          Math.floor(terminalContainer.clientHeight / term._core._renderService.dimensions.actualCellHeight)
+        );
+      }
+
+      // Initial message
+      term.writeln('Welcome to \x1B[1;3;31mxterm.js\x1B[0m full-screen terminal!');
+      term.write('$ ');
+
+      // Handle window resizing
+      window.addEventListener('resize', fitTerminal);
+
+      // Initial fit
+      window.onload = fitTerminal;
     </script>
   </body>
 </html>
