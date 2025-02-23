@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Full Screen Terminal</title>
+    <link rel="stylesheet" href="./xterm.js/css/xterm.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+      }
+      #terminal-container {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="terminal-container"></div>
+    <script src="path/to/xterm.js"></script>
+    <script>
+      const terminal = new Terminal();
+      terminal.open(document.getElementById("terminal-container"));
+      terminal.write("Welcome to xterm.js full screen!\r\n");
+    </script>
+  </body>
+</html>
