@@ -1,65 +1,138 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <title>Full-Screen xterm.js Terminal</title>
-    <!-- Link to xterm.css -->
-    <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+    <meta charset="UTF-8" />
+    <title>System Core Test Terminal</title>
     <style>
-      /* Fullscreen styling */
-      html, body {
-        height: 100%;
+      body {
+        font-family: monospace;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
         margin: 0;
-        padding: 0;
-        background-color: #000;
+        padding: 20px;
       }
-
-      /* Fullscreen terminal container */
       #terminal {
         width: 100%;
-        height: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid #333;
+        padding: 10px;
+        background-color: #262626;
+        min-height: 400px;
+        overflow-y: auto;
+      }
+      #output {
+        white-space: pre-wrap;
+        line-height: 1.4em;
+      }
+      #command-input {
+        width: calc(100% - 20px);
+        padding: 8px;
+        margin-top: 10px;
+        border: none;
+        background-color: #333;
+        color: #d4d4d4;
+      }
+      #command-input:focus {
+        outline: none;
       }
     </style>
-    <!-- xterm.js library -->
-    <script src="node_modules/xterm/lib/xterm.js"></script>
   </head>
   <body>
-    <!-- Terminal container -->
-    <div id="terminal"></div>
+    <div id="terminal">
+      <div id="output"></div>
+      <input
+        type="text"
+        id="command-input"
+        placeholder="Enter command here..."
+        autofocus
+      />
+    </div>
 
-    <!-- Initialize xterm.js -->
+    <!-- Include the kernel core -->
+    <script src="kernel.js"></script>
+
+    <!-- Terminal Command Parser and Handler -->
     <script>
-      // Initialize terminal
-      const term = new Terminal({
-        cursorBlink: true, // Enable cursor blinking
-        fontFamily: 'monospace',
-        theme: {
-          background: '#000000', // Set background color
-          foreground: '#ffffff'  // Set text color
-        }
-      });
+      // Get references to DOM elements.
+      const outputEl = document.getElementById("output");
+      const inputEl = document.getElementById("command-input");
 
-      // Attach terminal to the DOM
-      term.open(document.getElementById('terminal'));
-
-      // Resize terminal to fill the container
-      function fitTerminal() {
-        const terminalContainer = document.getElementById('terminal');
-        term.resize(
-          Math.floor(terminalContainer.clientWidth / term._core._renderService.dimensions.actualCellWidth),
-          Math.floor(terminalContainer.clientHeight / term._core._renderService.dimensions.actualCellHeight)
-        );
+      // Print text to the terminal output area.
+      function printOutput(text) {
+        outputEl.innerText += text + "\n";
+        outputEl.scrollTop = outputEl.scrollHeight;
       }
 
-      // Initial message
-      term.writeln('Welcome to \x1B[1;3;31mxterm.js\x1B[0m full-screen terminal!');
-      term.write('$ ');
+      // Display initial help message.
+      printOutput("Welcome to the Test Terminal. Type 'help' for commands.");
 
-      // Handle window resizing
-      window.addEventListener('resize', fitTerminal);
+      // Command parser: tokenizes input and calls appropriate kernel functions.
+      function handleCommand(command) {
+        const args = command.trim().split(" ");
+        const cmd = args[0].toLowerCase();
 
-      // Initial fit
-      window.onload = fitTerminal;
+        switch (cmd) {
+          case "help":
+            printOutput("Available commands:");
+            printOutput("  help             - Show this help message.");
+            printOutput(
+              "  start [name]     - Start a process with the given name."
+            );
+            printOutput("  list             - List all running processes.");
+            printOutput(
+              "  broadcast [msg]  - Broadcast a message to all processes."
+            );
+            break;
+
+          case "start":
+            if (args.length < 2) {
+              printOutput("Error: 'start' command requires a process name.");
+            } else {
+              const procName = args.slice(1).join(" ");
+              const proc = kernel.startProcess(procName);
+              printOutput(
+                `Process started: PID ${proc.pid}, Name: ${proc.name}`
+              );
+            }
+            break;
+
+          case "list":
+            const procs = kernel.listProcesses();
+            if (procs.length === 0) {
+              printOutput("No processes are currently running.");
+            } else {
+              printOutput("Running processes:");
+              procs.forEach((proc) => {
+                printOutput(`  PID ${proc.pid}: ${proc.name} [${proc.status}]`);
+              });
+            }
+            break;
+
+          case "broadcast":
+            if (args.length < 2) {
+              printOutput("Error: 'broadcast' command requires a message.");
+            } else {
+              const msg = args.slice(1).join(" ");
+              kernel.broadcast(msg);
+              printOutput(`Broadcasted message: "${msg}"`);
+            }
+            break;
+
+          default:
+            printOutput(`Unrecognized command: ${command}`);
+        }
+      }
+
+      // Listen for Enter key events in the command input.
+      inputEl.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          const command = inputEl.value;
+          printOutput("> " + command);
+          handleCommand(command);
+          inputEl.value = "";
+        }
+      });
     </script>
   </body>
 </html>
