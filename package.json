@@ -21,7 +21,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^9.33.0",
     "eslint-config-next": "15.5.0",
     "husky": "^8.0.0",
     "lint-staged": "^16.1.5",
