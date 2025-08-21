@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Homepage',
@@ -8,12 +9,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <header className="p-4 border-b mb-4">
+          <nav className="flex gap-4">
+            <Link href="/about">About</Link>
+            <Link href="/projects">Projects</Link>
+            <Link href="/publications">Publications</Link>
+            <Link href="/talks">Talks</Link>
+            <Link href="/cv">CV</Link>
+          </nav>
+        </header>
+        {children}
+      </body>
     </html>
   )
 }
