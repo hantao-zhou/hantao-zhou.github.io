@@ -25,29 +25,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-          cache: "pnpm"
+          cache: "npm"
 
       # Install pnpm (this is what fixes “Unable to locate executable file: pnpm”)
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.15.0
-          run_install: false
+          run_install: true
 
       - name: Print versions
         run: |
           node -v
-          pnpm -v
+          npm -v
 
       # CI-safe install (uses lockfile); we’ll approve needed builds in package.json below
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: npm install --frozen-lockfile
 
       - name: Typecheck & Lint
-        run: pnpm check
+        run: npm check
 
       - name: Build (static export)
-        run: pnpm build
+        run: npm build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
