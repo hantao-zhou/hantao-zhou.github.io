@@ -104,7 +104,7 @@ export default function Home() {
           </section>
 
           <section id="education">
-            <h2>Education</h2>
+            <h2 className="roman">Education</h2>
             <table>
               <thead>
                 <tr>
@@ -170,7 +170,7 @@ export default function Home() {
           </section>
 
           <section id="projects">
-            <h2>Projects</h2>
+            <h2 className="roman">Projects</h2>
             <h3>Robotics Decision‑Making with Multimodal LLMs — University of Hamburg</h3>
             <p>2024‑09 – 2024‑11</p>
             <ul>
@@ -185,7 +185,7 @@ export default function Home() {
           </section>
 
           <section id="awards">
-            <h2>Awards & Certificates</h2>
+            <h2 className="gilded roman">Awards & Certificates</h2>
             <ul>
               <li>CET‑6: 623; TOEFL: 113</li>
               <li>2nd‑Class Scholarship, BUPT — 2021, 2022 (Top 10%)</li>
@@ -214,7 +214,7 @@ export default function Home() {
           </section>
 
           <section id="education">
-            <h2>教育经历</h2>
+            <h2 className="roman">教育经历</h2>
             <table>
               <thead>
                 <tr>
@@ -280,7 +280,7 @@ export default function Home() {
           </section>
 
           <section id="projects">
-            <h2>项目经历</h2>
+            <h2 className="roman">项目经历</h2>
             <h3>基于多模态大模型的机器人决策 — 汉堡大学</h3>
             <p>2024‑09 – 2024‑11</p>
             <ul>
@@ -295,7 +295,7 @@ export default function Home() {
           </section>
 
           <section id="awards">
-            <h2>奖项与证书</h2>
+            <h2 className="gilded roman">奖项与证书</h2>
             <ul>
               <li>CET‑6：623；TOEFL：113</li>
               <li>北京邮电大学二等奖学金（前 10%）：2021、2022</li>

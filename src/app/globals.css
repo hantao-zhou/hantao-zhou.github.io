@@ -1,31 +1,32 @@
 :root {
-  /* Base palette */
-  --bg: #f7f9fc;
-  --fg: #16192a;
-  --muted: #5a6072;
-  --border: #e6e9f1;
-  --accent: #2a7bff;
-  --accent-2: #ff7a59;
-  --accent-3: #7c5cff;
-  /* Gradient background stops (light, colourful, no black) */
-  --bg1: #f6f9ff; /* soft blue */
-  --bg2: #fff3eb; /* warm peach */
-  --bg3: #f7f5ff; /* lilac */
+  /* Base palette — Tsinghua-inspired purples with soft neutrals */
+  --bg: #f7f5fb;
+  --fg: #181525;
+  --muted: #6b647a;
+  --border: #e8e3f0;
+  /* Accents (primary hues for highlights and ripples) */
+  --accent: #722f8c;  /* deep Tsinghua-like purple */
+  --accent-2: #c45ccf; /* orchid pink */
+  --accent-3: #a27bd6; /* soft lavender */
+  /* Gradient background stops (gentle, colourful, no black) */
+  --bg1: #f6f2fa; /* light lavender */
+  --bg2: #fff4fb; /* faint pink */
+  --bg3: #f2f4ff; /* cool periwinkle */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Keep dark readable but not black */
-    --bg: #141829;
-    --fg: #e9ecf4;
-    --muted: #9aa3b6;
-    --border: #2a2f44;
-    --accent: #6fb0ff;
-    --accent-2: #ffb088;
-    --accent-3: #b7a6ff;
-    --bg1: #1a2138; /* navy */
-    --bg2: #251f3a; /* plum */
-    --bg3: #1b2a3a; /* teal-navy */
+    /* Dark palette — comfortable, purple-leaning, not black */
+    --bg: #1b1530;
+    --fg: #ece7f5;
+    --muted: #b3adc5;
+    --border: #2e2650;
+    --accent: #b58af2;   /* luminous purple for contrast */
+    --accent-2: #e7a6d5; /* warm pink */
+    --accent-3: #9d84ee; /* mid lavender */
+    --bg1: #201a3a; /* deep indigo */
+    --bg2: #281d43; /* plum */
+    --bg3: #1f2749; /* indigo-blue */
   }
 }
 
@@ -52,6 +53,7 @@ body {
   margin: 0 auto;
   position: relative;
   z-index: 1; /* above background canvas */
+  counter-reset: sec; /* for Roman numerals */
 }
 
 /* Typography */
@@ -73,6 +75,15 @@ h2 {
   padding-top: 12px;
 }
 
+/* Subtle Roman numerals before section titles */
+section h2::before {
+  counter-increment: sec;
+  content: counter(sec, upper-roman) ". ";
+  color: var(--muted);
+  opacity: 0.6;
+  letter-spacing: 0.06em;
+}
+
 h3 {
   font-size: 16px;
   color: var(--muted);
@@ -88,7 +99,7 @@ blockquote {
   background: color-mix(in oklab, var(--bg) 94%, var(--accent) 6%);
 }
 @supports not (background: color-mix(in oklab, white 10%, black)) {
-  blockquote { background: rgba(42, 123, 255, 0.06); }
+  blockquote { background: rgba(114, 47, 140, 0.08); }
 }
 
 /* Inline emphasis */
@@ -104,12 +115,12 @@ code {
 }
 
 .highlight {
-  background: linear-gradient(120deg, color-mix(in oklab, var(--accent) 30%, transparent) 0%, transparent 60%);
+  background: linear-gradient(120deg, color-mix(in oklab, var(--accent) 28%, transparent) 0%, transparent 60%);
   border-radius: 2px;
   padding: 0 2px;
 }
 @supports not (background: color-mix(in oklab, white 10%, black)) {
-  .highlight { background: linear-gradient(120deg, rgba(42,123,255,0.25) 0%, transparent 60%); }
+  .highlight { background: linear-gradient(120deg, rgba(114,47,140,0.22) 0%, transparent 60%); }
 }
 
 /* Blinking caret */
@@ -174,3 +185,64 @@ button:disabled { opacity: 0.6; cursor: wait; transform: none; }
 .muted { color: var(--muted); }
 .serif { font-family: var(--font-serif), ui-serif, serif; }
 .mono { font-family: var(--font-mono), ui-monospace, monospace; }
+
+/* Roman-inspired micro-utilities */
+.roman { font-variant: small-caps; letter-spacing: 0.02em; }
+.gilded {
+  color: var(--gold, #d4af37);
+  background: linear-gradient(180deg, var(--gold-light, #f6e27a), var(--gold, #d4af37) 55%, var(--gold-deep, #b58f2b));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0.5px 0 rgba(0,0,0,0.15);
+}
+
+/* Gold palette variables */
+:root {
+  --gold-deep: #b58f2b;
+  --gold: #d4af37;
+  --gold-light: #f6e27a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gold-deep: #a7892e;
+    --gold: #e2c75b;
+    --gold-light: #f6e79a;
+  }
+}
+
+/* WinBox.js theming to match site palette */
+.winbox {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-3) 100%) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18), 0 6px 12px rgba(0, 0, 0, 0.10) !important;
+  border: 1px solid var(--border) !important;
+}
+.winbox .wb-header { color: #fff !important; height: 36px; line-height: 36px; }
+.winbox .wb-body {
+  background: color-mix(in oklab, var(--bg) 97%, var(--fg) 3%) !important;
+  color: var(--fg) !important;
+}
+@supports not (background: color-mix(in oklab, white 10%, black)) {
+  .winbox .wb-body { background: rgba(255, 255, 255, 0.88) !important; }
+}
+
+/* Laurel ornament for Awards heading (very subtle) */
+#awards h2 {
+  position: relative;
+}
+#awards h2::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -2px;
+  width: 170px;
+  height: 22px;
+  opacity: 0.18;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='40' viewBox='0 0 300 40' fill='none'><g stroke='%23b58f2b' stroke-width='2' stroke-linecap='round'><path d='M20 30 C30 20 35 10 25 10 C15 10 15 20 20 30'/><path d='M35 28 C45 18 50 8 40 8 C32 8 32 18 35 28'/><path d='M60 30 C70 20 75 10 65 10 C55 10 55 20 60 30'/><path d='M75 28 C85 18 90 8 80 8 C72 8 72 18 75 28'/></g><g stroke='%23b58f2b' stroke-width='2' stroke-linecap='round' transform='translate(300,0) scale(-1,1)'><path d='M20 30 C30 20 35 10 25 10 C15 10 15 20 20 30'/><path d='M35 28 C45 18 50 8 40 8 C32 8 32 18 35 28'/><path d='M60 30 C70 20 75 10 65 10 C55 10 55 20 60 30'/><path d='M75 28 C85 18 90 8 80 8 C72 8 72 18 75 28'/></g></svg>");
+}
