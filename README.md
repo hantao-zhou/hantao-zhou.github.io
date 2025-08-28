@@ -18,4 +18,3 @@ npm run build
 The static site will be generated in the `out` directory, ready to be published on GitHub Pages.
 
 
-xxxxxs
