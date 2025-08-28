@@ -2,9 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+type WinBoxConstructor = new (
+  title: string,
+  options?: Record<string, unknown>
+) => unknown;
+
 declare global {
   interface Window {
-    WinBox?: any;
+    WinBox?: WinBoxConstructor;
   }
 }
 
@@ -59,10 +64,10 @@ export default function WinBoxButton({
   }, []);
 
   const openWindow = useCallback(() => {
-    if (!window.WinBox) return;
+    const WB = window.WinBox;
+    if (!WB) return;
     // Avoid non-deterministic values during render: call only on click
-    // @ts-ignore - provided by the loaded script
-    new window.WinBox(title, {
+    new WB(title, {
       html,
       x: 'center',
       y: 'center',
