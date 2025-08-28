@@ -1,3 +1,176 @@
+:root {
+  /* Base palette */
+  --bg: #f7f9fc;
+  --fg: #16192a;
+  --muted: #5a6072;
+  --border: #e6e9f1;
+  --accent: #2a7bff;
+  --accent-2: #ff7a59;
+  --accent-3: #7c5cff;
+  /* Gradient background stops (light, colourful, no black) */
+  --bg1: #f6f9ff; /* soft blue */
+  --bg2: #fff3eb; /* warm peach */
+  --bg3: #f7f5ff; /* lilac */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Keep dark readable but not black */
+    --bg: #141829;
+    --fg: #e9ecf4;
+    --muted: #9aa3b6;
+    --border: #2a2f44;
+    --accent: #6fb0ff;
+    --accent-2: #ffb088;
+    --accent-3: #b7a6ff;
+    --bg1: #1a2138; /* navy */
+    --bg2: #251f3a; /* plum */
+    --bg3: #1b2a3a; /* teal-navy */
+  }
+}
+
+/* Fonts from next/font set CSS variables on :root */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   margin: 0;
+  color: var(--fg);
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg3) 100%);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
+
+
+.container {
+  max-width: 960px;
+  padding: 40px 20px 96px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1; /* above background canvas */
+}
+
+/* Typography */
+h1, h2, h3 {
+  margin: 0 0 8px;
+  color: var(--fg);
+}
+
+h1 {
+  font-family: var(--font-serif), Georgia, ui-serif, serif;
+  font-size: clamp(32px, 6vw, 56px);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(18px, 2.4vw, 24px);
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+h3 {
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+p { margin: 8px 0 16px; color: var(--fg); }
+blockquote {
+  margin: 12px 0 20px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  background: color-mix(in oklab, var(--bg) 94%, var(--accent) 6%);
+}
+@supports not (background: color-mix(in oklab, white 10%, black)) {
+  blockquote { background: rgba(42, 123, 255, 0.06); }
+}
+
+/* Inline emphasis */
+code {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: color-mix(in oklab, var(--bg) 92%, var(--fg) 8%);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+@supports not (background: color-mix(in oklab, white 10%, black)) {
+  code { background: rgba(0,0,0,0.06); }
+}
+
+.highlight {
+  background: linear-gradient(120deg, color-mix(in oklab, var(--accent) 30%, transparent) 0%, transparent 60%);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+@supports not (background: color-mix(in oklab, white 10%, black)) {
+  .highlight { background: linear-gradient(120deg, rgba(42,123,255,0.25) 0%, transparent 60%); }
+}
+
+/* Blinking caret */
+.cursor {
+  display: inline-block;
+  width: 0.6ch;
+  margin-left: 2px;
+  color: currentColor;
+  animation: blink 1.2s steps(1) infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+
+/* Nav */
+nav ul {
+  display: flex;
+  gap: 14px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  flex-wrap: wrap;
+}
+nav a {
+  text-decoration: none;
+  color: var(--muted);
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+nav a:hover {
+  color: var(--fg);
+  border-color: var(--border);
+  background: color-mix(in oklab, var(--bg) 96%, var(--fg) 4%);
+}
+@supports not (background: color-mix(in oklab, white 10%, black)) {
+  nav a:hover { background: rgba(0,0,0,0.04); }
+}
+
+/* Sections */
+section + section { margin-top: 28px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { border-bottom: 1px solid var(--border); padding: 8px 6px; text-align: left; }
+tbody tr:hover { background: color-mix(in oklab, var(--bg) 98%, var(--fg) 2%); }
+
+/* Buttons */
+button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg) 96%, var(--fg) 4%);
+  color: var(--fg);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+button:hover { transform: translateY(-1px); border-color: var(--accent); }
+button:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+/* Utilities */
+.muted { color: var(--muted); }
+.serif { font-family: var(--font-serif), ui-serif, serif; }
+.mono { font-family: var(--font-mono), ui-monospace, monospace; }

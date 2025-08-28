@@ -2,30 +2,35 @@
 
 import { useState } from 'react';
 import WinBoxButton from "../components/WinBoxButton";
+import RippleCanvas from "../components/RippleCanvas";
 
 export default function Home() {
   const [lang, setLang] = useState<'en' | 'zh'>('en');
 
   return (
     <main className="container">
+      <RippleCanvas />
       <header>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-          <h1 style={{ margin: 0 }}>{lang === 'en' ? 'Hantao Zhou' : '周涵韬'}</h1>
+          <h1 className="serif" style={{ margin: 0 }}>
+            {lang === 'en' ? 'Hantao Zhou' : '周涵韬'}
+          </h1>
           <button onClick={() => setLang((l) => (l === 'en' ? 'zh' : 'en'))} aria-label="Toggle language">
             {lang === 'en' ? '切换到中文' : 'Switch to English'}
           </button>
         </div>
-        <p>
+        <p className="mono">
           <code>hantaozhouted@gmail.com</code> · <code>+86 152 1081 2512</code>
         </p>
         {lang === 'en' ? (
           <blockquote>
-            Measuring progress by impact, not lines of code. AI systems, LLMs,
-            and robotics — from algorithms to production.
+            Measuring progress by <span className="highlight">impact</span>, not lines of code. <span className="highlight">AI systems</span>, <span className="highlight">LLMs</span>, and <span className="highlight">robotics</span> — from algorithms to production
+            <span className="cursor" aria-hidden>▌</span>
           </blockquote>
         ) : (
           <blockquote>
-            以影响衡量进展，不以代码行数。专注 AI 系统、LLM 与机器人，从算法到落地。
+            以<span className="highlight">影响</span>衡量进展，不以代码行数。专注 <span className="highlight">AI 系统</span>、<span className="highlight">LLM</span> 与 <span className="highlight">机器人</span>，从算法到落地
+            <span className="cursor" aria-hidden>▌</span>
           </blockquote>
         )}
         <nav aria-label="Primary">
@@ -130,7 +135,7 @@ export default function Home() {
             <h2>Skills</h2>
             <h3>Languages & Frameworks</h3>
             <ul>
-              <li>Python, C/C++, JavaScript/TypeScript, Java, Ruby, Lua, Lisp, Matlab, WebAssembly (Emscripten)</li>
+              <li><span className="highlight">Python</span>, C/C++, JavaScript/TypeScript, Java, Ruby, Lua, Lisp, Matlab, WebAssembly (Emscripten)</li>
               <li>PyTorch, Triton, CUDA, HuggingFace Transformers, scikit‑learn, SciPy, Pandas, NumPy/CuPy, TileLang</li>
               <li>English, German, Latin</li>
             </ul>
@@ -169,7 +174,7 @@ export default function Home() {
             <h3>Robotics Decision‑Making with Multimodal LLMs — University of Hamburg</h3>
             <p>2024‑09 – 2024‑11</p>
             <ul>
-              <li>Designed and implemented a multimodal LLM‑based control and decision system; presented at MFMEAI@ICML 2024.</li>
+              <li>Designed and implemented a multimodal LLM‑based control and decision system; presented at <span className="highlight">MFMEAI@ICML 2024</span>.</li>
             </ul>
 
             <h3>Enzymatic Reaction Analysis with Multimodal LLMs — THUNLP, Tsinghua</h3>
